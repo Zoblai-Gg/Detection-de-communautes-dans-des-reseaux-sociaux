@@ -1,0 +1,63 @@
+def generer_graphe_aleatoire():
+
+    # Initialisation de la liste d'adjacence, qui est une liste vide pour chaque sommet
+    liste_dadjacence = list()
+
+    # Boucle à travers tous les sommets pour les initialiser dans la liste d'adjacence
+    for i in range(NOMBRE_DE_SOMMETS):
+        liste_dadjacence.append(list())
+        liste_dadjacence[i].append(i+1)
+
+    # Ajouter des sommets adjacents aléatoires pour chaque sommet
+    for i in range(NOMBRE_DE_SOMMETS):
+        # Définir un nombre aléatoire de sommets voisins pour le sommet 'i + 1'
+        nb_sommets = random.randrange(1, NOMBRE_DE_SOMMETS)
+
+        # Ajouter des voisins tant que le nombre de voisins est inférieur à nb_sommets
+        while len(liste_dadjacence[i]) < nb_sommets:
+            som_a_ajouter = random.randrange(1, NOMBRE_DE_SOMMETS+1)
+
+            # Éviter les boucles (éviter de connecter le sommet à lui-même) et éviter les doublons
+            if som_a_ajouter != i+1 and som_a_ajouter not in liste_dadjacence[i]:
+                liste_dadjacence[i].append(som_a_ajouter)  # Ajouter l'adjacence du sommet actuel
+                liste_dadjacence[som_a_ajouter-1].append(i+1)  # Ajouter l'adjacence inverse (bidirectionnelle)
+    return liste_dadjacence
+
+# Fonction pour afficher la liste d'adjacence d'un graphe
+def afficher_liste_dadjacence(graphe):
+
+    for i, sous_liste in enumerate(graphe, start=1):
+        print(f"Liste d'adjacence du sommet {i}, inclut : {sous_liste}")
+
+# Fonction pour calculer le degré maximal d'un graphe
+def calculer_degre_max(graphe):
+
+    max = 0
+    # Parcours de chaque sous-liste d'adjacence pour calculer les degrés
+    for sous_liste in graphe:
+        # Si la longueur de la sous-liste est supérieure au max actuel mettre à jours max
+        if len(sous_liste) > max :
+            max = len(sous_liste)
+
+    print("le degre maximal du graphe est :",max-1)
+
+# Fonction pour calculer le nombre d'occurance pour chaque degré
+def nb_occ_de_chaque_degre(graphe) :
+
+    degres = [len(nb_voisins)-1 for nb_voisins in graphe]
+
+    print("Pour chaque degré du graphe le nombre de sommets ayant ce degré")
+
+    for i in range(1, NOMBRE_DE_SOMMETS) :
+        print(f"Pour le degre {i} : {degres.count(i)}")
+
+# Cette fonction renvois le nombre de chemins induits dans le graphe de longueur 2
+def nb_chemin_de_longeur2(graphe):
+
+  cpt = 0
+  for u in range(len(graphe)):
+    for v in graphe[u-1]:
+      for w in graphe[v-1]:
+        if w not in graphe[u-1] and w != u:
+          cpt += 1
+  return cpt // 2  # On divise par 2 car chaque chemin est compté deux fois
