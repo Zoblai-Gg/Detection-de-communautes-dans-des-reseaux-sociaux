@@ -1,79 +1,174 @@
 import random
+from matplotlib import pyplot as plt
+import pandas as pd
+from igraph import Graph
 
 # Définir le nombre de sommets dans le graphe
-NOMBRE_DE_SOMMETS = 10
+NOMBRE_DE_SOMMETS = 5
+PROBABILITE = 0.5
+
+import random
+
+# _______________________________ Partie des graphes aléatoires _______________________________
 
 
 def generer_graphe_aleatoire():
+    """    Générer la liste d'adjacence d'un graphe sous forme de dictionnaire. """
 
-    # Initialisation de la liste d'adjacence, qui est une liste vide pour chaque sommet
-    liste_dadjacence = list()
+    liste_dadjacence = {i: [] for i in range(NOMBRE_DE_SOMMETS)}  # Initialisation de la liste d'adjacence
 
-    # Boucle à travers tous les sommets pour les initialiser dans la liste d'adjacence
+    # Ajouter des arêtes avec probabilité p
     for i in range(NOMBRE_DE_SOMMETS):
-        liste_dadjacence.append(list())
-        liste_dadjacence[i].append(i+1)
+        for j in range(i + 1, NOMBRE_DE_SOMMETS):    # On évite les boucles
+            if random.random() < PROBABILITE:
+                liste_dadjacence[i].append(j)
+                liste_dadjacence[j].append(i)  # Graphe non orienté
 
-    # Ajouter des sommets adjacents aléatoires pour chaque sommet
-    for i in range(NOMBRE_DE_SOMMETS):
-        # Définir un nombre aléatoire de sommets voisins pour le sommet 'i + 1'
-        nb_sommets = random.randrange(1, NOMBRE_DE_SOMMETS)
-
-        # Ajouter des voisins tant que le nombre de voisins est inférieur à nb_sommets
-        while len(liste_dadjacence[i]) < nb_sommets:
-            som_a_ajouter = random.randrange(1, NOMBRE_DE_SOMMETS+1)
-
-            # Éviter les boucles (éviter de connecter le sommet à lui-même) et éviter les doublons
-            if som_a_ajouter != i+1 and som_a_ajouter not in liste_dadjacence[i]:
-                liste_dadjacence[i].append(som_a_ajouter)  # Ajouter l'adjacence du sommet actuel
-                liste_dadjacence[som_a_ajouter-1].append(i+1)  # Ajouter l'adjacence inverse (bidirectionnelle)
     return liste_dadjacence
 
-# Fonction pour afficher la liste d'adjacence d'un graphe
 def afficher_liste_dadjacence(graphe):
+    """ Affiche la liste d'adjacence d'un graphe sous forme de dictionnaire. """
 
-    for i, sous_liste in enumerate(graphe, start=1):
-        print(f"Liste d'adjacence du sommet {i}, inclut : {sous_liste}")
+    for i in range(len(graphe)):
+        print(f"Liste d'adjacence du sommet {i} est relié à : {graphe[i]}")
 
-# Fonction pour calculer le degré maximal d'un graphe
+
 def calculer_degre_max(graphe):
+    """ Calcule le degré maximal dans un graphe """
 
-    max = 0
-    # Parcours de chaque sous-liste d'adjacence pour calculer les degrés
-    for sous_liste in graphe:
-        # Si la longueur de la sous-liste est supérieure au max actuel mettre à jours max
-        if len(sous_liste) > max :
-            max = len(sous_liste)
+    max_degre = 0
+    # Parcours de chaque sommet et de sa liste de voisins
+    for voisins in graphe.values():
+        if len(voisins) > max_degre:
+            max_degre = len(voisins)
 
-    print("le degre maximal du graphe est :",max-1)
+    print("Le degré maximal du graphe est :", max_degre)
 
-# Fonction pour calculer le nombre d'occurance pour chaque degré
-def nb_occ_de_chaque_degre(graphe) :
 
-    degres = [len(nb_voisins)-1 for nb_voisins in graphe]
+def grahique_occ_de_chaque_degre(graphe):
+    """ Un graphique donnant pour chaque degré du graphe le nombre de sommets ayant ce degré  """
 
-    print("Pour chaque degré du graphe le nombre de sommets ayant ce degré")
+    degres = [len(voisins) for voisins in graphe.values()]  # Calcul des degrés pour chaque sommet
 
-    for i in range(1, NOMBRE_DE_SOMMETS) :
-        print(f"Pour le degre {i} : {degres.count(i)}")
+    # Trouver le degré maximal
+    max_degre = max(degres)
 
-# Cette fonction renvois le nombre de chemins induits dans le graphe de longueur 2
-def nb_chemin_de_longeur2(graphe):
+    print("\nPour chaque degré du graphe le nombre de sommets ayant ce degré")
 
-  cpt = 0
-  for u in range(len(graphe)):
-    for v in graphe[u-1]:
-      for w in graphe[v-1]:
-        if w not in graphe[u-1] and w != u:
-          cpt += 1
-  return cpt // 2  # On divise par 2 car chaque chemin est compté deux fois
+    for i in range(max_degre + 1):  # On affiche pour tous les degrés possibles
+        print(f"Pour le degré {i} : {degres.count(i)} sommets")
+
+        # Comptage des fréquences des degrés
+        distribution = {}
+
+    for degre in degres:
+        distribution[degre] = distribution.get(degre, 0) + 1
+
+    # Tracer le graphique
+    plt.bar(distribution.keys(), distribution.values(), color='skyblue', edgecolor='black')
+    plt.xlabel("Degré")
+    plt.ylabel("Nombre de sommets")
+    plt.title("Distribution des degrés dans le graphe")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+
+def nb_chemin_de_longueur2(graphe):
+    """ Calcule le nombre de chemins de longueur 2 dans le graphe """
+    cpt = 0
+    for u in graphe:
+        for v in graphe[u]:
+            for w in graphe[v]:
+                if w not in graphe[u] and w != u:
+                    cpt += 1
+    return cpt // 2  # On divise par 2 car chaque chemin est compté deux fois
+
+
+# _______________________________ Partie des graphes aléatoires _______________________________
+
+# Charger de graphe ego-Facebook
+facebook_graphe = Graph.Read_Edgelist('facebook_combined.txt', directed=False)
+
+# Charger de graphe email
+email_graphe = Graph.Read_Edgelist('email-Eu-core.txt', directed=False)
+
+# Charger graphe de lastfm
+charger_fichire = pd.read_csv("lastfm_asia_edges.csv")
+lastfm_graphe = Graph.DataFrame(charger_fichire, directed=False)
+
+
+def calculer_degre_max_stanford(graphe):
+    """" Cette fonction permet de renvoyer le dégré maximal d'un graphe de Stanfort"""
+    degrees = graphe.degree()
+    degre_max = max(degrees)
+    return degre_max
+
+import matplotlib.pyplot as plt
+
+def nb_occ_de_chaque_degre_stanfort(graphe):
+    degrees = graphe.degree()  # Liste des degrés de tous les nœuds
+    plt.hist(degrees, bins=range(min(degrees), max(degrees)+1), edgecolor='black')  # Histogramme des degrés
+    plt.title("Distribution des degrés")
+    plt.xlabel("Degré")
+    plt.ylabel("Nombre de nœuds")
+    plt.show()
+
+def nb_chemin_de_longeur2_stanfort(graphe):
+    cpt = 0
+    for u in graphe.vs:
+        voisin_u = graphe.neighbors(u.index)
+        for v in voisin_u:
+            for w in graphe.neighbors(v):
+                if u.index != w and not graphe.are_adjacent(u.index, w):  # Si u et w ne sont pas reliés directement
+                    cpt += 1
+    return cpt // 2  #On divise par 2 car chaque chemin est compté deux fois
+
+
+#   _______________________________ DEUXIEME PARTIE _______________________________
+
+
+def bron_kerbosch2(R, P, X, G):
+    """ Algorithme Bron-Kerbosch """
+
+    # Si P et X sont vides, alors R est une clique maximale
+    if not P and not X:
+        print("Clique maximale trouvée:", R)
+        return
+
+    # Choisir un pivot u dans P ∪ X (ici, on choisit un sommet parmi P ∪ X)
+    u = next(iter(P.union(X)))
+
+    # Pour chaque sommet v dans P \ N(u), on explore récursivement
+    for v in list(P - set(G[u])):
+        bron_kerbosch2(
+            R.union([v]),
+            P.intersection(G[v]),
+            X.intersection(G[v]),
+            G
+        )
+        # Mettre à jour P et X
+        P.remove(v)
+        X.add(v)
+
 
 
 if __name__ == "__main__" :
-    #graphe= generer_graphe_aleatoire()
-    #afficher_liste_dadjacence(graphe)
-    #calculer_degre_max(graphe)
-    #nb_occ_de_chaque_degre(graphe)
+
+    graphe= generer_graphe_aleatoire()
+
+    afficher_liste_dadjacence(graphe)
+    # calculer_degre_max(graphe)
+    grahique_occ_de_chaque_degre(graphe)
     #adjacency_list = [[1,4,2], [2, 1,3,5], [3, 2,4], [4,1,3], [5, 2]]
-    #print("Nombre de chemins induits de longueur 2 :",nb_chemin_de_longeur2(adjacency_list))
+    #print("Nombre de chemins induits de longueur 2 :",nb_chemin_de_longueur2(graphe))
+
+    #_____________2e_partie____________
+
+    #P = set(graphe.keys())  # Tous les sommets du graphe sont candidats
+    #R = set()  # Aucune clique au départ
+    #X = set()  # Aucune exploration effectuée
+    #bron_kerbosch2(R, P, X, graphe)
+
+
+
     pass

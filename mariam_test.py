@@ -5,6 +5,7 @@ import sys
 
 # Définir le nombre de sommets dans le graphe
 NOMBRE_DE_SOMMETS = 5
+PROBABILITE = 0.5
 
 def generer_graphe_aleatoire():
     # Créer un dictionnaire pour la liste d'adjacence
@@ -13,6 +14,7 @@ def generer_graphe_aleatoire():
     # Ajouter des sommets adjacents aléatoires pour chaque sommet
     for i in range(1, NOMBRE_DE_SOMMETS + 1):
         # Définir un nombre aléatoire de sommets voisins pour le sommet 'i'
+
         nb_sommets = random.randrange(1, NOMBRE_DE_SOMMETS)
 
         # Ajouter des voisins tant que le nombre de voisins est inférieur à nb_sommets
@@ -58,16 +60,20 @@ def bron_kerbosch2(R, P, X, G):
 
 # Test Exemple d'utilisation sur un graphe aléatoire 
 if __name__ == "__main__":
-    # Test avec le graph aleatoire (fonction generer_graphe_aleatoire)
-    G = generer_graphe_aleatoire()
 
-    print("Graph ***********:")
-    afficher_liste_dadjacence(G)
+
+    print(generer_graphe_aleatoire())
+    # Test avec le graph aleatoire (fonction generer_graphe_aleatoire)
+    #G = generer_graphe_aleatoire()
+
+    #print("Graph ***********:")
+    #afficher_liste_dadjacence(G)
 
     # Initialisation des ensembles R, P et X
-    P = set(G.keys())  # Tous les sommets du graphe sont candidats
-    R = set()  # Aucune clique au départ
-    X = set()  # Aucune exploration effectuée
+    #P = set(G.keys())  # Tous les sommets du graphe sont candidats
+    #R = set()  # Aucune clique au départ
+    #X = set()  # Aucune exploration effectuée
 
     # Appel à l'algorithme Bron-Kerbosch2 avec pivot
-    bron_kerbosch2(R, P, X, G)
+    #bron_kerbosch2(R, P, X, G)
+    pass
