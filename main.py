@@ -151,6 +151,79 @@ def bron_kerbosch2(R, P, X, G):
         X.add(v)
 
 
+#   _______________________________ TROISIEME PARTIE _______________________________
+
+def calculer_graphes_gi(graphe, ordre):
+    """
+    Calcule les graphes Gi selon l'ordre donné.
+    :param graphe: Liste d'adjacence du graphe initial.
+    :param ordre: Ordre des sommets (liste).
+    :return: Liste des graphes Gi (liste de listes d'adjacence).
+    """
+    n = len(ordre)
+    graphes_gi = []
+
+    for i in range(n):
+        # Conserver uniquement les sommets de {v_i, ..., v_n}
+        sommets_restants = set(ordre[i:])
+        graphe_gi = {v: [u for u in voisins if u in sommets_restants] for v, voisins in graphe.items() if v in sommets_restants}
+        graphes_gi.append(graphe_gi)
+
+    return graphes_gi
+
+#   _______________________________ PARTIE  BONUS_______________________________
+
+def bron_kerbosch_independant(R, P, X, G):
+    """
+            Variante de l'algorithme de Bron-Kerbosch pour les ensembles indépendants maximaux.
+
+            :param R: Ensemble en cours de construction (indépendant).
+            :param P: Ensemble des candidats potentiels à ajouter à R.
+            :param X: Ensemble des sommets à exclure.
+            :param G: Graphe sous forme de liste d'adjacence.
+            :yield: Un ensemble indépendant maximal.       """
+
+    if not P and not X:
+        # Si P et X sont vides, R est un ensemble indépendant maximal
+        yield R
+        return
+
+    # Choisir un pivot (un sommet parmi P ∪ X)
+    u = next(iter(P.union(X)))
+
+    # Pour chaque sommet v dans P \ N(u), explorer récursivement
+    for v in list(P - set(G.get(u, []))):
+        yield from bron_kerbosch_independant(
+            R.union([v]),
+            P.intersection(set(G.get(v, []))),
+            X.intersection(set(G.get(v, []))),
+            G
+        )
+        # Mettre à jour P et X
+        P.remove(v)
+        X.add(v)
+
+def calculer_ensembles_independants_maximaux(graphes_gi):
+    """
+    Calcule tous les ensembles indépendants maximaux pour chaque graphe Gi.
+
+    :param graphes_gi: Liste des graphes Gi (liste de listes d'adjacence).
+    :return: Liste des ensembles indépendants maximaux pour chaque Gi    """
+
+    i = 0
+    for Gi in graphes_gi:
+        # Initialiser les ensembles R, P, et X
+        R = set()  # Ensemble indépendant en construction
+        P = set(Gi.keys())  # Tous les sommets de Gi
+        X = set()  # Aucun sommet exclu au départ
+
+        # Calculer les ensembles indépendants maximaux pour Gi
+        i = i + 1
+        print("Pour G{}",i)
+
+        for ensemble in bron_kerbosch_independant(R, P, X, Gi):
+            print(ensemble)
+
 
 if __name__ == "__main__" :
 
@@ -158,7 +231,7 @@ if __name__ == "__main__" :
 
     afficher_liste_dadjacence(graphe)
     # calculer_degre_max(graphe)
-    grahique_occ_de_chaque_degre(graphe)
+    #grahique_occ_de_chaque_degre(graphe)
     #adjacency_list = [[1,4,2], [2, 1,3,5], [3, 2,4], [4,1,3], [5, 2]]
     #print("Nombre de chemins induits de longueur 2 :",nb_chemin_de_longueur2(graphe))
 
@@ -169,6 +242,21 @@ if __name__ == "__main__" :
     #X = set()  # Aucune exploration effectuée
     #bron_kerbosch2(R, P, X, graphe)
 
+    #_____________3e_partie____________
 
+    ordre = list(graphe.keys())
+    random.shuffle(ordre)
+    print("\nOrdre des sommets :", ordre)
+    graphes_Gi= calculer_graphes_gi(graphe,ordre)
+
+    #for i, graphe_gi in enumerate(graphes_Gi):
+    #    print(f"G_{i + 1} (avec sommets {ordre[i:]}):")
+    #   for sommet, voisins in graphe_gi.items():
+    #        print(f"  {sommet}: {voisins}")
+
+    #_____________Partie_bonus____________
+
+    print("Ensembles indépendants maximaux trouvés :\n")
+    calculer_ensembles_independants_maximaux(graphes_Gi)
 
     pass

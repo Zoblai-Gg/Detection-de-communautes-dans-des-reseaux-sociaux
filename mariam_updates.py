@@ -6,7 +6,7 @@ from igraph import Graph
 import pandas as pd 
 
 
-NOMBRE_DE_SOMMETS = 50
+NOMBRE_DE_SOMMETS = 5
 PROBABILITE = 0.5
 
 
@@ -30,7 +30,7 @@ def afficher_liste_dadjacence(graphe):
     for i in range(len(graphe)):
         print(f"Liste d'adjacence du sommet {i} est relié à : {graphe[i]}")
 
-        /***************************graphe de Stanfort************************/
+        #***************************graphe de Stanfort************************
 
 def convertir_en_liste_dadjacence(graph):
     return {vertex.index: graph.neighbors(vertex.index) for vertex in graph.vs}
@@ -75,9 +75,9 @@ def bron_kerbosch2(R, P, X, G):
 if __name__ == "__main__":
     # Test avec le graph aleatoire (fonction generer_graphe_aleatoire)
     G = generer_graphe_aleatoire()
-   # GF = convertir_en_liste_dadjacence(facebook_graphe)
-    #GE = convertir_en_liste_dadjacence(email_graphe)
-    GS = convertir_en_liste_dadjacence( lastfm_graphe)
+    GF = convertir_en_liste_dadjacence(facebook_graphe)
+    GE = convertir_en_liste_dadjacence(email_graphe)
+    GS = convertir_en_liste_dadjacence(lastfm_graphe)
 
 
     print("Graph ***********:")
@@ -85,13 +85,13 @@ if __name__ == "__main__":
     print("************************fin de la liste ***********:")
 
     # Initialisation des ensembles R, P et X
-    P = set(G.keys()) 
+    #P = set(G.keys())
     #P = set(GF.keys()) 
     #P = set(GE.keys()) 
-   # P = set(GS.keys())  # Tous les sommets du graphe sont candidats
+    P = set(GS.keys())  # Tous les sommets du graphe sont candidats
     R = set()  # Aucune clique au départ
     X = set()  # Aucune exploration effectuée
 
     # Appel à l'algorithme Bron-Kerbosch2 avec pivot
    
-    bron_kerbosch2(R, P, X, G) 
+    bron_kerbosch2(R, P, X, GS)

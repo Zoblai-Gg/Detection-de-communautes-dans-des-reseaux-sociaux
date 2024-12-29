@@ -42,3 +42,50 @@ def nb_chemin_de_longeur2_stanfort(graph):
 # Exemple d'utilisation
 path_count = nb_chemin_de_longeur2_stanfort(facebook_graphe)
 print(f"Nombre de chemins induits de longueur 2 dans le graphe Facebook : {path_count}")
+#____________________________________3eme partie _____________________
+
+def calculer_graphes_gi(graphe, ordre):
+    """
+    Calcule les graphes Gi selon l'ordre donné.
+    :param graphe: Liste d'adjacence du graphe initial.
+    :param ordre: Ordre des sommets (liste).
+    :return: Liste des graphes Gi (liste de listes d'adjacence).
+    """
+    n = len(ordre)
+    graphes_gi = []
+
+    for i in range(n):
+        # Conserver uniquement les sommets de {v_i, ..., v_n}
+        sommets_restants = set(ordre[i:])
+        graphe_gi = {v: [u for u in voisins if u in sommets_restants] for v, voisins in graphe.items() if v in sommets_restants}
+        graphes_gi.append(graphe_gi)
+
+    return graphes_gi
+
+
+    # Étape 2 : Définir un ordre aléatoire des sommets
+    #ordre = list(graphe.keys())
+    #random.shuffle(ordre)
+    #print("\nOrdre des sommets :", ordre)
+
+
+def calculer_maximal_independent_sets(G, ordre):
+    """
+    Calcul de tous les ensembles indépendants maximaux pour chaque graphe Gi.
+    :param G: Liste d'adjacence du graphe initial.
+    :param ordre: Ordre des sommets.
+    :return: Liste des ensembles indépendants maximaux pour chaque Gi.
+    """
+    n = len(ordre)
+    graphes_gi = calculer_graphes_gi(G, ordre)  # Obtenir les Gi
+    ensembles_independants = []
+
+    for i, graphe_gi in enumerate(graphes_gi, start=1):
+        print(f"\nEnsembles indépendants maximaux pour G_{i} (sommets {ordre[i-1:]}):")
+        # Utiliser Bron-Kerbosch pour chaque Gi
+        independants_gi = list(bron_kerbosch_independant(set(), set(graphe_gi.keys()), set(), graphe_gi))
+        ensembles_independants.append(independants_gi)
+        for independant in independants_gi:
+            print(independant)
+
+    return ensembles_independants
