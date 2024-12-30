@@ -40,7 +40,7 @@ facebook_graphe = Graph.Read_Edgelist('facebook_combined.txt', directed=False)
 # Charger de graphe email
 email_graphe = Graph.Read_Edgelist('email-Eu-core.txt', directed=False)
 # Charger graphe de lastfm
-charger_fichire = pd.read_csv("lastfm_asia_edges.csv")
+charger_fichire = pd.read_csv("../lastfm_asia_edges.csv")
 lastfm_graphe = Graph.DataFrame(charger_fichire, directed=False)
 
 #debut de la partie 2 *********************************************************************

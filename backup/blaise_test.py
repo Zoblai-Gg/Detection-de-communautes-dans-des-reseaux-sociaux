@@ -8,7 +8,7 @@ facebook_graphe = Graph.Read_Edgelist('facebook_combined.txt', directed=False)
 email_graphe = Graph.Read_Edgelist('email-Eu-core.txt', directed=False)
 
 # Charger graphe de lastfm
-charger_fichire = pd.read_csv("lastfm_asia_edges.csv")
+charger_fichire = pd.read_csv("../lastfm_asia_edges.csv")
 lastfm_graphe = Graph.DataFrame(charger_fichire, directed=False)
 
 
@@ -89,3 +89,42 @@ def calculer_maximal_independent_sets(G, ordre):
             print(independant)
 
     return ensembles_independants
+
+#-------------------------------------------------------------------
+
+#fonctions pours grand graphes
+
+def calculer_degre_max_stanford(graphe):
+    """" Cette fonction permet de renvoyer le dégré maximal d'un graphe de Stanfort"""
+    degrees = graphe.degree()
+    degre_max = max(degrees)
+    return degre_max
+
+def nb_occ_de_chaque_degre_stanfort(graphe):
+
+    # Liste des degrés de tous les nœuds
+    degrees = graphe.degree()
+
+    # Compter les occurrences de chaque degré
+    occurrences = Counter(degrees)
+    print("Occurrences des degrés :")
+    for degre, count in sorted(occurrences.items()):
+        print(f"Pour le degré {degre}: {count} sommets")
+
+    plt.hist(degrees, bins=range(min(degrees), max(degrees)+1), edgecolor='black')  # Histogramme des degrés
+    plt.title("Distribution des degrés")
+    plt.xlabel("Degré")
+    plt.ylabel("Nombre de nœuds")
+    plt.show()
+
+def nb_chemin_de_longeur2_stanfort(graphe):
+    cpt = 0
+    for u in graphe.vs:
+        voisin_u = graphe.neighbors(u.index)
+        for v in voisin_u:
+            for w in graphe.neighbors(v):
+                if u.index != w and not graphe.are_adjacent(u.index, w):  # Si u et w ne sont pas reliés directement
+                    cpt += 1
+    return cpt // 2  #On divise par 2 car chaque chemin est compté deux fois
+
+
